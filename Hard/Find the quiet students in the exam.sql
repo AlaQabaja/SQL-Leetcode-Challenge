@@ -93,7 +93,7 @@ where student_id != all(select student_id from t1)
 order by 1
 
 
--- my solution 
+-- My Solution 
 WITH student_rank AS 
 (SELECT rank() OVER (PARTITION BY exam_id ORDER BY score) rank_asc,
        rank() OVER (PARTITION BY exam_id ORDER BY score desc) rank_desc,
