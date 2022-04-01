@@ -23,7 +23,17 @@ with t1 as(
 select *,
 sum(frequency) over(order by number) as cum_sum, (sum(frequency) over())/2 as middle
 from numbers)
-
 select avg(number) as median
 from t1
 where middle between (cum_sum - frequency) and cum_sum
+
+
+--t1
+-- +----------+-------------+
+-- |  Number  |  Frequency  |Cum_Sum |Middel | Filter (cum_sum - frequency)
+-- +----------+-------------|        |
+-- |  0       |  7          |7       | 6     | 0
+-- |  1       |  1          |8       | 6     | 7
+-- |  2       |  3          |11      | 6     | 8
+-- |  3       |  1          |12      | 6     | 11
+-- +----------+-------------+
