@@ -91,3 +91,17 @@ from exam join student
 using (student_id)
 where student_id != all(select student_id from t1)
 order by 1
+
+
+-- my solution 
+WITH student_rank AS 
+(SELECT rank() OVER (PARTITION BY exam_id ORDER BY score) rank_asc,
+       rank() OVER (PARTITION BY exam_id ORDER BY score desc) rank_desc,
+	   student_id
+FROM Exam
+)
+SELECT e.student_id, s.student_name
+FROM Exam e INNER JOIN Student s ON e.student_id = s.student_id
+WHERE e.student_id NOT IN (SELECT student_id
+                         FROM student_rank
+						 WHERE rank_asc = 1 or rank_desc = 1)
