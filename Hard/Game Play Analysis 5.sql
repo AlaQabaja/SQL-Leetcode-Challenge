@@ -59,3 +59,29 @@ from t1
 where rnk = 1
 group by 1
 order by 1
+
+
+-- My solution
+Our record of interest is the install date record for each player and the record
+that follows it in terms of date. 
+1) Partitioned by player, we rank by event_date --> install_date will have rank of 1
+2) event_date in this case will equate to install_date 
+3) We partition by player, we find the lead date value --> next date value 
+4) We filter records to only show where rank = 1
+5) We group by install_date from above and we calculate:
+sum records where next_date = event_date + 1 and divide by count for that date
+
+WITH rank_table AS 
+(
+SELECT player_id,
+       event_date, 
+	   row_number() over (partition by player_id order by event_date) as date_rank,
+	   lead(event_date,1) over(parition by player_id order by event_date) as next_date
+FROM Activity
+)
+SELECT event_date as install_date, 
+       count(distinct player_id) AS installs_on_that_date, 
+	   SUM(CASE WHEN next_date = event_date + 1 THEN 1 ELSE 0 END)/count(DISTINCT player_id) AS Day1_retention
+FROM rank_table 
+WHERE date_rank = 1
+GROUP BY event_date 
