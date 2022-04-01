@@ -47,3 +47,15 @@ select d.name as department, e.name as employee, salary,
 from Employee e join Department d
 on e.departmentid = d.id) a
 where a.rk<4
+
+-- My Solution 
+WITH rank_calc AS 
+(
+SELECT d.Name,
+       e.Name, 
+	   dense_rank() OVER (PARTITION BY DepartmentId ORDER BY Salary DESC) Rank
+FROM Employee e INNER JOIN Department d on e.DepartmentId = d.Id 
+)
+SELECT *
+FROM rank_calc
+WHERE Rank <= 3
