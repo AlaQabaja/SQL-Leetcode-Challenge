@@ -63,3 +63,21 @@ else "lower"
 end as comparison
 from t1
 order by 1 desc
+
+
+-- My solution 
+WITH department_month_avg AS 
+(SELECT date_format(pay_date, '%Y-%m') AS pay_month, d.department_id, avg(amount) avgsalary
+FROM salary s inner join department d on s.employee_id = d.employee_id
+group by d.department_id, date_format(pay_date, '%Y-%m')
+),
+monthavg AS 
+(
+SELECT pay_month, department_id,avgsalary, avg(avgsalary) over(partition by pay_month) monthavg
+FROM department_month_avg
+)
+SELECT pay_month, department_id, CASE WHEN avgsalary > monthavg then higher
+                                     WHEN avgsalary < monthavg then lower
+									                            ELSE same end as comparison
+FROM monthavg
+						
