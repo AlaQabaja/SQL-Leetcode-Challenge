@@ -62,3 +62,16 @@ from t1
 where month<recent_month
 order by 1, 2 desc
 
+
+-- my solution
+with salary_calc AS 
+(
+SELECT Id,
+       Month,
+	   max(month) over(partition by id) maxMonth,
+	   sum(Salary) over(parition by Id ORDER BY month rows between 2 preceding and current_row) AS CumSalary
+FROM employee
+)
+SELECT *
+FROM salary_calc
+WHERE Month < maxMonth
